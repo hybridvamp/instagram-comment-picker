@@ -1,41 +1,78 @@
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 
 const Filter = ({ dataToEdit, handleDataView, originalSourceData }) => {
 	const [textEmojifilterQuery, setTextEmojiFilterQuery] = useState("");
 	const [mentionFilterQuery, setMentionFilterQuery] = useState("");
 	const [hashtagFilterQuery, setHashtagFilterQuery] = useState("");
 	const [blacklistFilterQuery, setBlacklistFilterQuery] = useState("");
+	const [mentionMultiplicator, setMentionMultiplicator] = useState(false);
+	const mentionCheck = useRef(null);
+	const [duplicateUser, setDuplicateUser] = useState(false);
+	const duplicateUserCheck = useRef(null);
+
+	const mentionMultiplicatorClass = mentionMultiplicator
+		? "border rounded-full border-grey flex items-center cursor-pointer w-12 bg-green-500 justify-end"
+		: "border rounded-full border-grey flex items-center cursor-pointer w-12 bg-gray-400 justify-start";
+
+	const duplicateUserClass = duplicateUser
+		? "border rounded-full border-grey flex items-center cursor-pointer w-12 bg-green-500 justify-end"
+		: "border rounded-full border-grey flex items-center cursor-pointer w-12 bg-gray-400 justify-start";
 
 	//filter Funktion
 	const filterObject = () => {
-		const filteredData = originalSourceData.filter(function (i) {
-			const textEmojiInComment = i.Comment.toLowerCase();
-			const mentionInComment = i.Comment.toLowerCase();
-			const hashtagInComment = i.Comment.toLowerCase();
-			const blacklistUser = i.User.toLowerCase();
-			console.log(!blacklistUser.includes(blacklistFilterQuery));
-
-			return (
-				(textEmojiInComment.includes(textEmojifilterQuery) &&
-					mentionInComment.includes(mentionFilterQuery) &&
-					hashtagInComment.includes(hashtagFilterQuery)) ||
-				!blacklistUser.includes(blacklistFilterQuery)
+		//check if duplicate user button is true
+		if (duplicateUser) {
+			const filteredData_noDuplicateUser = originalSourceData.filter(
+				(obj, index, self) =>
+					index === self.findIndex((t) => t.User === obj.User)
 			);
-		});
-		if (
-			textEmojifilterQuery ||
-			mentionFilterQuery ||
-			hashtagFilterQuery ||
-			blacklistFilterQuery
-		) {
-			if (Object.keys(filteredData).length != 0) {
-				handleDataView(filteredData);
-			} else {
-				handleDataView([{ "": "" }]);
-			}
-		} else {
-			handleDataView(originalSourceData);
 		}
+
+		//chef if mention multiplicator is true
+		if (mentionMultiplicator) {
+			const duplicatedObjs = [];
+			for (const key in originalSourceData) {
+				if (originalSourceData.hasOwnProperty(key)) {
+					const entry = originalSourceData[key];
+					if (entry.Comment.includes("@")) {
+						const duplicatedEntry = Object.assign({}, entry);
+						duplicatedObjs.push(duplicatedEntry);
+					}
+				}
+			}
+
+			const newObj = Object.assign({}, originalSourceData, {
+				duplicatedObjs,
+			});
+			console.log(newObj);
+		}
+		// const filteredData = originalSourceData.filter(function (i) {
+		// 	const textEmojiInComment = i.Comment.toLowerCase();
+		// 	const mentionInComment = i.Comment.toLowerCase();
+		// 	const hashtagInComment = i.Comment.toLowerCase();
+		// 	const blacklistUser = i.User.toLowerCase();
+
+		// 	return (
+		// 		(textEmojiInComment.includes(textEmojifilterQuery) &&
+		// 			mentionInComment.includes(mentionFilterQuery) &&
+		// 			hashtagInComment.includes(hashtagFilterQuery)) ||
+		// 		!blacklistUser.includes(blacklistFilterQuery)
+		// 	);
+		// });
+		// if (
+		// 	textEmojifilterQuery ||
+		// 	mentionFilterQuery ||
+		// 	hashtagFilterQuery ||
+		// 	blacklistFilterQuery
+		// ) {
+		// 	if (Object.keys(filteredData).length !== 0) {
+		// 		handleDataView(filteredData);
+		// 	} else {
+		// 		handleDataView([{ "": "" }]);
+		// 	}
+		// } else {
+		// 	handleDataView(originalSourceData);
+		// }
 	};
 
 	//Text/ Emoji in Comment -> Filter comment by text/ emoji
@@ -54,6 +91,10 @@ const Filter = ({ dataToEdit, handleDataView, originalSourceData }) => {
 	};
 
 	//multiplicator by Mentions -> add same user to array/ list
+	//if mention in comment -> add user to list
+	const handleMentionMultiplicator = () => {
+		setMentionMultiplicator(!mentionMultiplicator);
+	};
 
 	//Blacklist -> delete by username
 	const handleBlacklistFilter = (event) => {
@@ -61,6 +102,10 @@ const Filter = ({ dataToEdit, handleDataView, originalSourceData }) => {
 	};
 
 	//allow Duplicate user -> check username by duplication
+	const handleDuplicateUser = () => {
+		setDuplicateUser(!duplicateUser);
+	};
+
 	return (
 		<div className="px-4 py-5 sm:p-6 w-full bg-zinc-800 rounded-lg p-6 text-white drop-shadow-lg">
 			<div className="grid grid-cols-6 gap-6">
@@ -79,7 +124,7 @@ const Filter = ({ dataToEdit, handleDataView, originalSourceData }) => {
 						onChange={handleTextEmojiFilter}
 					/>
 				</div>
-				<div className="col-span-6 sm:col-span-3">
+				<div className="col-span-6 sm:col-span-3 lg:col-span-2">
 					<label
 						htmlFor="mention-filter"
 						className="block text-sm font-medium leading-6 "
@@ -95,7 +140,7 @@ const Filter = ({ dataToEdit, handleDataView, originalSourceData }) => {
 					/>
 				</div>
 
-				<div className="col-span-6 sm:col-span-3">
+				<div className="col-span-6 sm:col-span-3 lg:col-span-2">
 					<label
 						htmlFor="hashtag-filter"
 						className="block text-sm font-medium leading-6 "
@@ -108,21 +153,6 @@ const Filter = ({ dataToEdit, handleDataView, originalSourceData }) => {
 						id="hashtag-filter"
 						className="mt-2 bg-neutral-900 block w-full rounded-md border-0 p-1.5 shadow-sm placeholder:text-gray-400 sm:text-sm sm:leading-6"
 						onChange={handleHashtagFilter}
-					/>
-				</div>
-
-				<div className="col-span-6 sm:col-span-6 lg:col-span-2">
-					<label
-						htmlFor="multiplicator-by-mentions"
-						className="block text-sm font-medium leading-6 "
-					>
-						Mention Multiplicator
-					</label>
-					<input
-						type="text"
-						name="multiplicator-by-mentions"
-						id="multiplicator-by-mentions"
-						className="mt-2 bg-neutral-900 block w-full rounded-md border-0 p-1.5 shadow-sm placeholder:text-gray-400 sm:text-sm sm:leading-6"
 					/>
 				</div>
 
@@ -144,17 +174,48 @@ const Filter = ({ dataToEdit, handleDataView, originalSourceData }) => {
 
 				<div className="col-span-6 sm:col-span-3 lg:col-span-2">
 					<label
+						htmlFor="multiplicator-by-mentions"
+						className="block text-sm font-medium leading-6 "
+					>
+						Mention Multiplicator
+					</label>
+					<input
+						ref={mentionCheck}
+						type="checkbox"
+						name="hashtag-filter"
+						id="hashtag-filter"
+						className="hidden"
+						onChange={handleMentionMultiplicator}
+					/>
+					<button
+						className={mentionMultiplicatorClass}
+						onClick={() => mentionCheck.current.click()}
+					>
+						<span className="rounded-full border w-6 h-6 border-grey shadow-inner bg-white shadow"></span>
+					</button>
+				</div>
+
+				<div className="col-span-6 sm:col-span-3 lg:col-span-2">
+					<label
 						htmlFor="duplicate-user"
 						className="block text-sm font-medium leading-6 "
 					>
-						Allow Duplicate user
+						Allow Duplicate User
 					</label>
 					<input
-						type="text"
+						ref={duplicateUserCheck}
+						type="checkbox"
 						name="duplicate-user"
 						id="duplicate-user"
-						className="mt-2 bg-neutral-900 block w-full rounded-md border-0 p-1.5 shadow-sm placeholder:text-gray-400 sm:text-sm sm:leading-6"
+						className="hidden"
+						onChange={handleDuplicateUser}
 					/>
+					<button
+						className={duplicateUserClass}
+						onClick={() => duplicateUserCheck.current.click()}
+					>
+						<span className="rounded-full border w-6 h-6 border-grey shadow-inner bg-white shadow"></span>
+					</button>
 				</div>
 			</div>
 			<button
