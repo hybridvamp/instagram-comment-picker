@@ -6,28 +6,28 @@ import axios from "axios";
 const App = () => {
 	const [dataView, setDataView] = useState(null);
 	const [originalData, setOriginalData] = useState(null);
-	// const [postData, setPostData] = useState(null);
-	// const [isLoading, setIsLoading] = useState(true);
-	// const postId = "CqCkYT0tOJv";
-	// const accessToken = process.env.META_ACCESS_TOKEN;
-	// const postUrl = `https://graph.facebook.com/v16.0/${postId}?fields=id,caption,media_type,media_url,permalink,thumbnail_url,thumbnail_width,thumbnail_height,username,timestamp&access_token=${accessToken}`;
+	const [postData, setPostData] = useState(null);
+	const [isLoading, setIsLoading] = useState(true);
+	const postId = "CqCkYT0tOJv";
+	const accessToken = process.env.META_ACCESS_TOKEN;
+	const postUrl = `https://graph.facebook.com/v16.0/${postId}?fields=id,caption,media_type,media_url,permalink,thumbnail_url,thumbnail_width,thumbnail_height,username,timestamp&access_token=${accessToken}`;
 
-	// useEffect(() => {
-	// 	axios
-	// 		.get(postUrl)
-	// 		.then((response) => {
-	// 			setPostData(response.data);
-	// 			setIsLoading(false);
-	// 		})
-	// 		.catch((error) => {
-	// 			console.log(error);
-	// 			setIsLoading(false);
-	// 		});
-	// }, []);
+	useEffect(() => {
+		axios
+			.get(postUrl)
+			.then((response) => {
+				setPostData(response.data);
+				setIsLoading(false);
+			})
+			.catch((error) => {
+				console.log(error);
+				setIsLoading(false);
+			});
+	}, []);
 
-	// if (isLoading) {
-	// 	return <div>Loading...</div>;
-	// }
+	if (isLoading) {
+		return <div>Loading...</div>;
+	}
 
 	return (
 		<div className="flex min-h-full items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
