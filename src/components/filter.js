@@ -46,33 +46,33 @@ const Filter = ({ dataToEdit, handleDataView, originalSourceData }) => {
 			});
 			console.log(newObj);
 		}
-		// const filteredData = originalSourceData.filter(function (i) {
-		// 	const textEmojiInComment = i.Comment.toLowerCase();
-		// 	const mentionInComment = i.Comment.toLowerCase();
-		// 	const hashtagInComment = i.Comment.toLowerCase();
-		// 	const blacklistUser = i.User.toLowerCase();
+		const filteredData = originalSourceData.filter(function (i) {
+			const textEmojiInComment = i.Comment.toLowerCase();
+			const mentionInComment = i.Comment.toLowerCase();
+			const hashtagInComment = i.Comment.toLowerCase();
+			const blacklistUser = i.User.toLowerCase();
 
-		// 	return (
-		// 		(textEmojiInComment.includes(textEmojifilterQuery) &&
-		// 			mentionInComment.includes(mentionFilterQuery) &&
-		// 			hashtagInComment.includes(hashtagFilterQuery)) ||
-		// 		!blacklistUser.includes(blacklistFilterQuery)
-		// 	);
-		// });
-		// if (
-		// 	textEmojifilterQuery ||
-		// 	mentionFilterQuery ||
-		// 	hashtagFilterQuery ||
-		// 	blacklistFilterQuery
-		// ) {
-		// 	if (Object.keys(filteredData).length !== 0) {
-		// 		handleDataView(filteredData);
-		// 	} else {
-		// 		handleDataView([{ "": "" }]);
-		// 	}
-		// } else {
-		// 	handleDataView(originalSourceData);
-		// }
+			return (
+				(textEmojiInComment.includes(textEmojifilterQuery) &&
+					mentionInComment.includes(mentionFilterQuery) &&
+					hashtagInComment.includes(hashtagFilterQuery)) ||
+				!blacklistUser.includes(blacklistFilterQuery)
+			);
+		});
+		if (
+			textEmojifilterQuery ||
+			mentionFilterQuery ||
+			hashtagFilterQuery ||
+			blacklistFilterQuery
+		) {
+			if (Object.keys(filteredData).length !== 0) {
+				handleDataView(filteredData);
+			} else {
+				handleDataView([{ "": "" }]);
+			}
+		} else {
+			handleDataView(originalSourceData);
+		}
 	};
 
 	//Text/ Emoji in Comment -> Filter comment by text/ emoji
